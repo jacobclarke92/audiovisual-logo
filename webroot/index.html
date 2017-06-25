@@ -1,0 +1,51 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Audiovisual Logo</title>
+        <meta name="description" content="">
+    </head>
+    <body>
+        <audio src="assets/Cha-Ching.mp3" id="audio" controls loop></audio>
+        <div class="text"></div>
+        <main id="main">
+            <div id="stage"></div>
+        </main>
+        <style type="text/css">
+        
+            body {
+                background-color: #010006;   
+            }
+
+            #main,
+            #stage {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+
+            #main {
+                overflow: hidden;
+            }
+
+            #audio {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 100;
+            }
+
+            #text {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                z-index: 100;
+            }
+
+        </style>
+        <script type="text/javascript" src="dist/scripts.js"></script>
+    </body>
+</html>
