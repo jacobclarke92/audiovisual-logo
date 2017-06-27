@@ -22,7 +22,6 @@ import {
 	getRandomValueFromArray,
 } from './utils/mathUtils'
 
-console.log(BLEND_MODES);
 
 const backgroundColor = 0x010006;
 
@@ -40,29 +39,35 @@ const renderer = autoDetectRenderer({
 	backgroundColor,
 	antialias: true,
 	// forceCanvas: true, // my laptop gpu is fucked
-});
+});	
 const canvas = renderer.view;
 $app.append(canvas);
 
-const songs = [
-	'Cookin.mp3',
-	'Drank.mp3',
-	'Cha-Ching.mp3',
-	'Chandelier.mp3',
-	'Alright.mp3',
-	'Shoop.mp3',
-	'Hotline Bling.mp3',
-	'Side To Side.mp3',
-	'In For The Kill (Skrillex remix).mp3',
-];
+const songs = [];
+const $songButtons = $('.audio-buttons .button');
+$songButtons.each(function() {
+	const song = $(this).data('file');
+	songs.push(song);
+	$(this).on('click', () => {
+		changeSong(song);
+	});
+});
 
 const $text = $('#text');
 
 // Initi audio vars
 const ctx = new AudioContext();
 const audio = document.getElementById('audio');
-audio.src = 'assets/' + getRandomValueFromArray(songs);
+let currentSong = getRandomValueFromArray(songs);
+changeSong(currentSong);
 const audioSrc = ctx.createMediaElementSource(audio);
+
+function changeSong(song) {
+	currentSong = song;
+	audio.src = (window.location.host.indexOf('localhost') >= 0 ? 'assets/' : 'https://bigsound.org.au/uploads/') + currentSong;
+	$('.audio-buttons .button').removeClass('active');
+	$('.button[data-file="'+currentSong+'"]').addClass('active');
+}
 
 // const lowPass = ctx.createBiquadFilter();
 // audioSrc.connect(lowPass);
@@ -82,13 +87,17 @@ analyser.connect(ctx.destination);
 const frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
 audio.addEventListener('canplaythrough', function() {
-	audio.volume = 0.6;
+	audio.volume = 1;//0.6;
 	audio.play();
 });
 
-const bassRange = [0,7];
-const midsRange = [30, 100];
+const bassRange = [0,6];
+const midsRange = [16, 75];
 const highsRange = [550, 650];
+
+const bassColor = 0xFF0000;
+const midsColor = 0x00FF00;
+const highsColor = 0x0000FF;
 
 // Create stage containers
 const stage = new Container();
@@ -106,7 +115,11 @@ const bars = [];
 for(let i=0; i < frequencyData.length; i++) {
 	const bar = new Graphics();
 	bar.lineStyle(0,0,1);
-	bar.beginFill(i % 100 === 0 ? 0xFF0000 : 0xFFFFFF, 1);
+	let color = 0xFFFFFF;
+	if(i >= bassRange[0] && i <= bassRange[1]) color = bassColor;
+	else if(i >= midsRange[0] && i <= midsRange[1]) color = midsColor;
+	else if(i >= highsRange[0] && i <= highsRange[1]) color = highsColor;
+	bar.beginFill(color);
 	bar.drawRect(i*2, 0, 2, 100);
 	bar.endFill();
 	bar.cacheAsBitmap = true;
@@ -168,7 +181,7 @@ function animate() {
     analyser.getByteFrequencyData(frequencyData);
 
     // use averages
-    const bassAverage = frequencyData.slice(bassRange[0], bassRange[1]).reduce((current, prev) => current+prev, 0) / (bassRange[1] - bassRange[0]) / 180 / 2;
+    const bassAverage = frequencyData.slice(bassRange[0], bassRange[1]).reduce((current, prev) => current+prev, 0) / (bassRange[1] - bassRange[0]) / 170 / 2;
     const midsAverage = frequencyData.slice(midsRange[0], midsRange[1]).reduce((current, prev) => current+prev, 0) / (midsRange[1] - midsRange[0]) / 140 / 2;
     const highsAverage = frequencyData.slice(highsRange[0], highsRange[1]).reduce((current, prev) => current+prev, 0) / (highsRange[1] - highsRange[0]) / 80 / 2;
     
@@ -187,7 +200,7 @@ function animate() {
     // qLine.position = {x: qLinePos, y: qLinePos};
 
     frequencyData.forEach((val, i) => {
-    	bars[i].scale.y = val / 100;
+    	bars[i].scale.y = val / 200;
     });
 
 	// Render and repeat animation

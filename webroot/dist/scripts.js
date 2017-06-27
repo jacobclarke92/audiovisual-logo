@@ -30203,8 +30203,6 @@ var _mathUtils = __webpack_require__(206);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-console.log(_pixi.BLEND_MODES);
-
 var backgroundColor = 0x010006;
 
 // Set screen size
@@ -30225,15 +30223,31 @@ var renderer = (0, _pixi.autoDetectRenderer)({
 var canvas = renderer.view;
 $app.append(canvas);
 
-var songs = ['Cookin.mp3', 'Drank.mp3', 'Cha-Ching.mp3', 'Chandelier.mp3', 'Alright.mp3', 'Shoop.mp3', 'Hotline Bling.mp3', 'Side To Side.mp3', 'In For The Kill (Skrillex remix).mp3'];
+var songs = [];
+var $songButtons = (0, _jquery2.default)('.audio-buttons .button');
+$songButtons.each(function () {
+	var song = (0, _jquery2.default)(this).data('file');
+	songs.push(song);
+	(0, _jquery2.default)(this).on('click', function () {
+		changeSong(song);
+	});
+});
 
 var $text = (0, _jquery2.default)('#text');
 
 // Initi audio vars
 var ctx = new AudioContext();
 var audio = document.getElementById('audio');
-audio.src = 'assets/' + (0, _mathUtils.getRandomValueFromArray)(songs);
+var currentSong = (0, _mathUtils.getRandomValueFromArray)(songs);
+changeSong(currentSong);
 var audioSrc = ctx.createMediaElementSource(audio);
+
+function changeSong(song) {
+	currentSong = song;
+	audio.src = (window.location.host.indexOf('localhost') >= 0 ? 'assets/' : 'https://bigsound.org.au/uploads/') + currentSong;
+	(0, _jquery2.default)('.audio-buttons .button').removeClass('active');
+	(0, _jquery2.default)('.button[data-file="' + currentSong + '"]').addClass('active');
+}
 
 // const lowPass = ctx.createBiquadFilter();
 // audioSrc.connect(lowPass);
@@ -30253,13 +30267,17 @@ analyser.connect(ctx.destination);
 var frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
 audio.addEventListener('canplaythrough', function () {
-	audio.volume = 0.6;
+	audio.volume = 1; //0.6;
 	audio.play();
 });
 
-var bassRange = [0, 7];
-var midsRange = [30, 100];
+var bassRange = [0, 6];
+var midsRange = [16, 75];
 var highsRange = [550, 650];
+
+var bassColor = 0xFF0000;
+var midsColor = 0x00FF00;
+var highsColor = 0x0000FF;
 
 // Create stage containers
 var stage = new _pixi.Container();
@@ -30277,7 +30295,9 @@ var bars = [];
 for (var i = 0; i < frequencyData.length; i++) {
 	var bar = new _pixi.Graphics();
 	bar.lineStyle(0, 0, 1);
-	bar.beginFill(i % 100 === 0 ? 0xFF0000 : 0xFFFFFF, 1);
+	var color = 0xFFFFFF;
+	if (i >= bassRange[0] && i <= bassRange[1]) color = bassColor;else if (i >= midsRange[0] && i <= midsRange[1]) color = midsColor;else if (i >= highsRange[0] && i <= highsRange[1]) color = highsColor;
+	bar.beginFill(color);
 	bar.drawRect(i * 2, 0, 2, 100);
 	bar.endFill();
 	bar.cacheAsBitmap = true;
@@ -30340,7 +30360,7 @@ function animate() {
 	// use averages
 	var bassAverage = frequencyData.slice(bassRange[0], bassRange[1]).reduce(function (current, prev) {
 		return current + prev;
-	}, 0) / (bassRange[1] - bassRange[0]) / 180 / 2;
+	}, 0) / (bassRange[1] - bassRange[0]) / 170 / 2;
 	var midsAverage = frequencyData.slice(midsRange[0], midsRange[1]).reduce(function (current, prev) {
 		return current + prev;
 	}, 0) / (midsRange[1] - midsRange[0]) / 140 / 2;
@@ -30363,7 +30383,7 @@ function animate() {
 	// qLine.position = {x: qLinePos, y: qLinePos};
 
 	frequencyData.forEach(function (val, i) {
-		bars[i].scale.y = val / 100;
+		bars[i].scale.y = val / 200;
 	});
 
 	// Render and repeat animation

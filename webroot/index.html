@@ -7,15 +7,55 @@
         <meta name="description" content="">
     </head>
     <body>
-        <audio src="assets/Cha-Ching.mp3" id="audio" controls loop></audio>
-        <div class="text"></div>
         <main id="main">
             <div id="stage"></div>
         </main>
+        <div id="audio-box">
+            <div class="audio-buttons">
+                <div class="button-group">
+                    <button class="button" data-file="Chandelier.mp3">Sia - Chandelier</button>
+                    (1:50)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Cha-Ching.mp3">Chairlift - Cha-Ching</button>
+                    (1:40)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Drank.mp3">Kendrick Lamar - Drank</button>
+                    (1:25)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Alright.mp3">Kendrick Lamar - Alright</button>
+                    (0:00)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Skrillex & Diplo - Where are ü now.mp3">Skrillex &amp; Diplo - Where are ü now</button>
+                    (3:06)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="In For The Kill (Skrillex remix).mp3">Laroux - In For The Kill (Skrillex remix)</button>
+                    (3:00)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Take Me Into Your Skin.mp3">Trentmøller - Take Me Into Your Skin</button>
+                    (2:02)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Golden Features - No One (ft. Thelma Plum).mp3">Golden Features, Thelma Plum - No One</button>
+                    (2:55)
+                </div>
+                <div class="button-group">
+                    <button class="button" data-file="Cookin.mp3">Fat Joe, Remy Ma, French Montana - Cookin</button>
+                    (2:00)
+                </div>
+            </div>
+            <audio src="" id="audio" controls loop></audio>
+        </div>
         <style type="text/css">
         
             body {
-                background-color: #010006;   
+                background-color: #010006;
+                font-family: Helvetica, Arial, sans-serif; 
             }
 
             #main,
@@ -31,18 +71,40 @@
                 overflow: hidden;
             }
 
-            #audio {
-                position: absolute;
-                top: 0;
-                left: 0;
-                z-index: 100;
-            }
-
-            #text {
+            #audio-box {
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 z-index: 100;
+            }
+
+            #audio {
+                width: 400px;
+            }
+
+            .audio-buttons {
+
+            }
+
+            .button-group {
+                color: #ccc;
+                display: flex;
+                align-items: center;
+                font-size: 13px;
+            }
+
+            .button {
+                text-align: left;
+                display: block;
+                border: 1px solid #3f3e4b;
+                outline: none;
+                color: black;
+                margin: 2px 5px 0 0;
+                font-size: 11px;
+            }
+
+            .button.active {
+                background-color: #a1f094;
             }
 
         </style>
