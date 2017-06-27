@@ -65,7 +65,7 @@ const audioSrc = ctx.createMediaElementSource(audio);
 
 function changeSong(song) {
 	currentSong = song;
-	audio.src = (window.location.host.indexOf('localhost') >= 0 ? 'assets/' : 'https://bigsound.org.au/uploads/') + currentSong;
+	audio.src = 'assets/' /*(window.location.host.indexOf('localhost') >= 0 ? 'assets/' : 'https://bigsound.org.au/uploads/')*/ + currentSong;
 	$('.audio-buttons .button').removeClass('active');
 	$('.button[data-file="'+currentSong+'"]').addClass('active');
 }
