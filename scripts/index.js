@@ -25,6 +25,8 @@ import {
 
 const backgroundColor = 0x010006;
 
+let showingUI = true;
+
 // Set screen size
 let screenWidth = getScreenWidth()/getPixelDensity();
 let screenHeight = getScreenHeight()/getPixelDensity();
@@ -42,6 +44,19 @@ const renderer = autoDetectRenderer({
 });	
 const canvas = renderer.view;
 $app.append(canvas);
+
+$('.toggle-ui').on('click', function () {
+	showingUI = !showingUI;
+	if(showingUI) {
+		// $(this).css('opacity', 1);
+		$('#audio-box').show();
+		barsContainer.renderable = true;
+	}else{
+		// $(this).css('opacity', 0);
+		$('#audio-box').hide();
+		barsContainer.renderable = false;
+	}
+});
 
 const songs = [];
 const $songButtons = $('.audio-buttons .button');
@@ -200,7 +215,7 @@ function animate() {
     // const qLinePos = [bass.width, mids.width, highs.width, hole.width].filter(val => !!val).sort()[1] / 2;
     // qLine.position = {x: qLinePos, y: qLinePos};
 
-    frequencyData.forEach((val, i) => {
+    if(showingUI) frequencyData.forEach((val, i) => {
     	bars[i].scale.y = val / 200;
     });
 

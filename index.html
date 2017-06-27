@@ -51,6 +51,7 @@
             </div>
             <audio src="" id="audio" controls loop></audio>
         </div>
+        <button class="button toggle-ui">Toggle UI</button>
         <style type="text/css">
         
             body {
@@ -105,6 +106,14 @@
 
             .button.active {
                 background-color: #a1f094;
+            }
+
+            .toggle-ui {
+                position: fixed;
+                bottom: 0;
+                right: 0;
+                z-index: 100;
+                cursor: pointer;
             }
 
         </style>
