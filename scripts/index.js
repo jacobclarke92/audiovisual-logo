@@ -182,7 +182,7 @@ function initScene() {
 	logo.addChild(qLine);
 
 	//if($(window).width() < 620) 
-		logo.scale.set(0.75);
+		logo.scale.set(1);
 
 	// bass.position.x = -100;
 	// highs.position.x = 100;
