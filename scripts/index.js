@@ -58,13 +58,14 @@ const $text = $('#text');
 // Initi audio vars
 const ctx = new AudioContext();
 const audio = document.getElementById('audio');
+audio.crossOrigin = 'anonymous';
 let currentSong = getRandomValueFromArray(songs);
 changeSong(currentSong);
 const audioSrc = ctx.createMediaElementSource(audio);
 
 function changeSong(song) {
 	currentSong = song;
-	audio.src = 'assets/' /*(window.location.host.indexOf('localhost') >= 0 ? 'assets/' : 'https://bigsound.org.au/uploads/')*/ + currentSong;
+	audio.src = (window.location.host.indexOf('localhost') >= 0 ? 'assets/' : 'https://bigsound.org.au/uploads/') + currentSong;
 	$('.audio-buttons .button').removeClass('active');
 	$('.button[data-file="'+currentSong+'"]').addClass('active');
 }
