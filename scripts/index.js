@@ -1,28 +1,9 @@
 import $ from 'jquery'
-import { 
-	autoDetectRenderer,
-	Container, 
-	Graphics,
-	Point,
-	Sprite,
-	BLEND_MODES,
-	loader,
-} from 'pixi.js'
-import { 
-	addResizeCallback, 
-	getPixelDensity, 
-	getScreenWidth, 
-	getScreenHeight 
-} from './utils/screenUtils'
-import {
-	radToDeg,
-	degToRad,
-	randomInt,
-	randomFloat,
-	getRandomValueFromArray,
-} from './utils/mathUtils'
+import { autoDetectRenderer, Container, Graphics, Sprite, BLEND_MODES, loader } from 'pixi.js'
+import { addResizeCallback, getPixelDensity, getScreenWidth, getScreenHeight } from './utils/screenUtils'
+import { getRandomValueFromArray } from './utils/mathUtils'
 
-
+const π = Math.PI;
 const backgroundColor = 0x010006;
 
 let showingUI = true;
@@ -37,7 +18,7 @@ const renderer = autoDetectRenderer({
 	width: screenWidth, 
 	height: screenHeight, 
 	resolution: getPixelDensity(),
-	transparent: false,
+	transparent: true,
 	backgroundColor,
 	antialias: true,
 	// forceCanvas: true, // my laptop gpu is fucked
@@ -114,16 +95,23 @@ const highsRange = [550, 650];
 const bassColor = 0xFF0000;
 const midsColor = 0x00FF00;
 const highsColor = 0x0000FF;
+// const bassColor = 0x3b06b6;//0x12cee3;
+// const midsColor = 0x7D00E9; //0xAB0E8D;//0x306cef;
+// const highsColor = 0xF63F43;
+
 
 // Create stage containers
 const stage = new Container();
 const logo = new Container();
+
+const mask = new Graphics();
 
 let bass = null;
 let mids = null;
 let highs = null;
 let hole = null;
 let qLine = null;
+let qLine2 = null;
 
 const barsContainer = new Container();
 const bars = [];
@@ -156,30 +144,94 @@ function init() {
 
 function initScene() {
 	bass = new Sprite(loader.resources['circle'].texture);
-	bass.tint = 0xFF0000;
+	bass.tint = bassColor;
 	mids = new Sprite(loader.resources['circle'].texture);
-	mids.tint = 0x00FF00;
+	mids.tint = midsColor;
 	highs = new Sprite(loader.resources['circle'].texture);
-	highs.tint = 0x0000FF;
+	highs.tint = highsColor;
 
 	hole = new Sprite(loader.resources['circle'].texture);
+    hole.scale.set(0.45);
+    hole.alpha = 0;
 	hole.tint = backgroundColor;
 
 	bass.anchor = mids.anchor = highs.anchor = hole.anchor = {x: 0.5, y: 0.5};
 	bass.blendMode = mids.blendMode = highs.blendMode = BLEND_MODES.SCREEN;
 
-	qLine = new Graphics();
-	qLine.beginFill(backgroundColor, 1);
-	qLine.drawRect(0, -20, 300, 40);
-	qLine.endFill();
-	qLine.rotation = Math.PI/4;
-	qLine.position = {x: 75, y: 75};
+	// qLine = new Graphics();
+	// qLine.beginFill(backgroundColor, 1);
+	// qLine.drawRect(0, -20, 300, 40);
+	// qLine.endFill();
+	// qLine.rotation = π/4;
+	// qLine.position = {x: 75, y: 75};
+
+
+	// qLine2 = new Graphics();
+	// qLine2.beginFill(0xE00034, 1);
+	// qLine2.drawRect(0, -20, 60, 40);
+	// qLine2.endFill();
+	// qLine2.rotation = π/4;
+	// qLine2.position = {x: 50, y: 50};
+
+	console.log('HEIGHT', hole.height);
+	const holeRadius = hole.height / 2;
+	const circum = 2*π*holeRadius;
+	const lineTheta = (40 / circum) * π*2;
+	const lineStartAngle = π/4 + lineTheta/2;
+	const lineEndAngle = π/4 - lineTheta/2;
+	mask.position = {x: screenWidth/2, y: screenHeight/2};
+	mask.beginFill(0x0000FF, 0.5);
+	// 
+	let coord = {x: 0, y: 0};
+	
+	mask.lineStyle(3, 0xFF0000, 1);
+	mask.arc(0, 0, holeRadius*2, π/4 + lineTheta/2, π*2.25 - lineTheta/2);// -holeRadius, holeRadius, 0, holeRadius);
+
+	mask.lineStyle(3, 0x00FF00, 1);
+	coord = {x: Math.cos(lineEndAngle)*holeRadius, y: Math.sin(lineEndAngle)*holeRadius};
+	coord = {x: coord.x + Math.cos(π/4)*(holeRadius/1.3), y: coord.y + Math.sin(π/4)*(holeRadius/1.3)}
+	mask.lineTo(coord.x, coord.y);
+	coord = {x: Math.cos(lineEndAngle)*holeRadius, y: Math.sin(lineEndAngle)*holeRadius};
+	mask.lineTo(coord.x, coord.y);
+	
+	mask.lineStyle(3, 0x0000FF, 1);
+	mask.arc(0, 0, holeRadius, π*2.25 - lineTheta/2, π/4 + lineTheta/2, true);// -holeRadius, holeRadius, 0, holeRadius);
+
+	mask.lineStyle(3, 0xFF00FF, 1);
+	coord = {x: Math.cos(lineStartAngle)*holeRadius, y: Math.sin(lineStartAngle)*holeRadius};
+	mask.lineTo(coord.x, coord.y);
+
+	mask.lineStyle(3, 0x00FFF0, 1);
+	coord = {x: coord.x + Math.cos(π/4)*(holeRadius/1.3), y: coord.y + Math.sin(π/4)*(holeRadius/1.3)}
+	mask.lineTo(coord.x, coord.y);
+	mask.endFill();
+
+	// mask.lineStyle(40, 0xFF0000, 1);
+	// mask.drawCircle(0,0, holeRadius + 20);
+	// mask.lineStyle(holeRadius, 0xFF0000, 1);
+	// mask.arc(0,0, holeRadius + 20, 0, π*2);
+	// mask.lineStyle(40, 0xFF0000, 1);
+	// mask.moveTo(0, holeRadius);
+
+	// mask.lineStyle(40, 0xFF0000, 1);
+	// mask.arc(0, 0, holeRadius + 20, π/4 + lineTheta/2, π*2.25 - lineTheta/2);// -holeRadius, holeRadius, 0, holeRadius);
+	
+
+	// mask.drawCircle(0,0, holeRadius);
+	// mask.drawCircle(0,0, holeRadius*1.5);
+	// mask.arc(0,0,holeRadius*1.5,0,Math.PI*1.45);
+	// mask.arc(0,0,holeRadius*1.5,0,Math.PI*2);
+	// mask.endFill();
+	// mask.lineTo(200, 0);
+
 
 	logo.addChild(bass);
 	logo.addChild(mids);
 	logo.addChild(highs);
-	logo.addChild(hole);
-	logo.addChild(qLine);
+	// logo.addChild(qLine);
+	// logo.addChild(qLine2);
+	// logo.addChild(hole);
+	// logo.mask = mask;
 
 	//if($(window).width() < 620) 
 		logo.scale.set(1);
@@ -190,6 +242,7 @@ function initScene() {
 	stage.addChild(logo);
 	barsContainer.position = {x: 0, y: 0};
 	stage.addChild(barsContainer);
+	stage.addChild(mask);
 
 	animate();
 }
@@ -213,7 +266,14 @@ function animate() {
     bass.scale.set(bassAverage);
     mids.scale.set(midsAverage);
     highs.scale.set(highsAverage);
-    hole.scale.set(Math.max(0, Math.min(bassAverage, midsAverage, highsAverage) - 0.15));
+    // hole.scale.set(Math.max(0, Math.min(bassAverage, midsAverage, highsAverage) - 0.15));
+
+    hole.scale.set(0.45);
+    bass.scale.set(Math.max(0.50, bassAverage));
+    mids.scale.set(Math.max(0.55, midsAverage));
+    highs.scale.set(Math.max(0.6, highsAverage));
+
+    // logo.scale.set(0.25);
 
     // const qLinePos = [bass.width, mids.width, highs.width, hole.width].filter(val => !!val).sort()[1] / 2;
     // qLine.position = {x: qLinePos, y: qLinePos};
@@ -234,7 +294,7 @@ function animate() {
 function handleResize(width, height) {
 	screenWidth = width/getPixelDensity();
 	screenHeight = height/getPixelDensity();
-	logo.position = {x: screenWidth/2, y: screenHeight/2};
+	logo.position = mask.position = {x: screenWidth/2, y: screenHeight/2};
 	renderer.resize(screenWidth, screenHeight);
 }
 
