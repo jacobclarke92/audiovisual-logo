@@ -111,7 +111,6 @@ let mids = null;
 let highs = null;
 let hole = null;
 let qLine = null;
-let qLine2 = null;
 
 const barsContainer = new Container();
 const bars = [];
@@ -130,11 +129,6 @@ for(let i=0; i < frequencyData.length; i++) {
 	bars.push(bar);
 	barsContainer.addChild(bar);
 }
-
-function createBar(i) {
-	
-}
-
 
 function init() {
 	loader.once('complete', (loader, resources) => initScene());
@@ -158,87 +152,82 @@ function initScene() {
 	bass.anchor = mids.anchor = highs.anchor = hole.anchor = {x: 0.5, y: 0.5};
 	bass.blendMode = mids.blendMode = highs.blendMode = BLEND_MODES.SCREEN;
 
-	// qLine = new Graphics();
-	// qLine.beginFill(backgroundColor, 1);
-	// qLine.drawRect(0, -20, 300, 40);
-	// qLine.endFill();
-	// qLine.rotation = π/4;
-	// qLine.position = {x: 75, y: 75};
-
-
-	// qLine2 = new Graphics();
-	// qLine2.beginFill(0xE00034, 1);
-	// qLine2.drawRect(0, -20, 60, 40);
-	// qLine2.endFill();
-	// qLine2.rotation = π/4;
-	// qLine2.position = {x: 50, y: 50};
-
-	console.log('HEIGHT', hole.height);
-	const holeRadius = hole.height / 2;
-	const circum = 2*π*holeRadius;
-	const lineTheta = (40 / circum) * π*2;
-	const lineStartAngle = π/4 + lineTheta/2;
-	const lineEndAngle = π/4 - lineTheta/2;
-	mask.position = {x: screenWidth/2, y: screenHeight/2};
-	mask.beginFill(0x0000FF, 0.5);
-	// 
-	let coord = {x: 0, y: 0};
 	
-	mask.lineStyle(3, 0xFF0000, 1);
-	mask.arc(0, 0, holeRadius*2, π/4 + lineTheta/2, π*2.25 - lineTheta/2);// -holeRadius, holeRadius, 0, holeRadius);
-
-	mask.lineStyle(3, 0x00FF00, 1);
-	coord = {x: Math.cos(lineEndAngle)*holeRadius, y: Math.sin(lineEndAngle)*holeRadius};
-	coord = {x: coord.x + Math.cos(π/4)*(holeRadius/1.3), y: coord.y + Math.sin(π/4)*(holeRadius/1.3)}
-	mask.lineTo(coord.x, coord.y);
-	coord = {x: Math.cos(lineEndAngle)*holeRadius, y: Math.sin(lineEndAngle)*holeRadius};
-	mask.lineTo(coord.x, coord.y);
+	const coord = {x: 20, y: 20};
 	
-	mask.lineStyle(3, 0x0000FF, 1);
-	mask.arc(0, 0, holeRadius, π*2.25 - lineTheta/2, π/4 + lineTheta/2, true);// -holeRadius, holeRadius, 0, holeRadius);
+	const sliceWidth = 40;
+	const innerRadius = hole.height / 2;
+	const innerCircum = 2*π*innerRadius;
+	const innerLineTheta = (sliceWidth / innerCircum) * π*2;
+	const innerLineStartAngle = π/4 + innerLineTheta/2;
+	const innerLineEndAngle = π/4 - innerLineTheta/2;
 
-	mask.lineStyle(3, 0xFF00FF, 1);
-	coord = {x: Math.cos(lineStartAngle)*holeRadius, y: Math.sin(lineStartAngle)*holeRadius};
-	mask.lineTo(coord.x, coord.y);
+	const outerRadius = innerRadius * 2;
+	const outerCircum = 2*π*outerRadius;
+	const outerLineTheta = (sliceWidth / outerCircum) * π*2;
+	const outerLineStartAngle = π/4 - outerLineTheta/2;
+	const outerLineEndAngle = π/4 + outerLineTheta/2;
 
-	mask.lineStyle(3, 0x00FFF0, 1);
-	coord = {x: coord.x + Math.cos(π/4)*(holeRadius/1.3), y: coord.y + Math.sin(π/4)*(holeRadius/1.3)}
-	mask.lineTo(coord.x, coord.y);
-	mask.endFill();
+	mask.beginFill(0x0000FF);
 
-	// mask.lineStyle(40, 0xFF0000, 1);
-	// mask.drawCircle(0,0, holeRadius + 20);
-	// mask.lineStyle(holeRadius, 0xFF0000, 1);
-	// mask.arc(0,0, holeRadius + 20, 0, π*2);
-	// mask.lineStyle(40, 0xFF0000, 1);
-	// mask.moveTo(0, holeRadius);
+	coord.x = Math.cos(innerLineStartAngle)*innerRadius;
+	coord.y = Math.sin(innerLineStartAngle)*innerRadius;
 
-	// mask.lineStyle(40, 0xFF0000, 1);
-	// mask.arc(0, 0, holeRadius + 20, π/4 + lineTheta/2, π*2.25 - lineTheta/2);// -holeRadius, holeRadius, 0, holeRadius);
+	mask.moveTo(coord.x, coord.y)
 	
+	mask.arc(0, 0, innerRadius, innerLineStartAngle, innerLineEndAngle);
 
-	// mask.drawCircle(0,0, holeRadius);
-	// mask.drawCircle(0,0, holeRadius*1.5);
-	// mask.arc(0,0,holeRadius*1.5,0,Math.PI*1.45);
-	// mask.arc(0,0,holeRadius*1.5,0,Math.PI*2);
-	// mask.endFill();
-	// mask.lineTo(200, 0);
+	coord.x = Math.cos(outerLineStartAngle)*outerRadius;
+	coord.y = Math.sin(outerLineStartAngle)*outerRadius;
 
+	mask.lineTo(coord.x, coord.y)
+
+	mask.arc(0,0, outerRadius, outerLineStartAngle, outerLineEndAngle, true);
+
+	coord.x = Math.cos(innerLineStartAngle)*innerRadius;
+	coord.y = Math.sin(innerLineStartAngle)*innerRadius;
+
+	mask.lineTo(coord.x, coord.y);
+
+
+
+
+
+	const lineRadius = innerRadius + 25;
+	const lineCircum = 2*π*lineRadius;
+	const lineTheta = (sliceWidth / lineCircum) * π*2;
+	const lineStartAngle = π/4 - lineTheta/2;
+	const lineEndAngle = π/4 + lineTheta/2;
+
+	qLine = new Graphics();
+	qLine.beginFill(0xF63F43, 1);
+
+	coord.x = Math.cos(innerLineEndAngle)*innerRadius;
+	coord.y = Math.sin(innerLineEndAngle)*innerRadius;
+
+	qLine.moveTo(coord.x, coord.y);
+	qLine.arc(0,0, innerRadius , innerLineEndAngle, innerLineStartAngle);
+
+	coord.x = Math.cos(lineEndAngle)*lineRadius;
+	coord.y = Math.sin(lineEndAngle)*lineRadius;
+	qLine.lineTo(coord.x, coord.y)
+	
+	qLine.arc(0,0, lineRadius , lineEndAngle, lineStartAngle, true);
+
+	coord.x = Math.cos(innerLineEndAngle)*innerRadius;
+	coord.y = Math.sin(innerLineEndAngle)*innerRadius;
+	qLine.lineTo(coord.x, coord.y)
 
 	logo.addChild(bass);
 	logo.addChild(mids);
 	logo.addChild(highs);
-	// logo.addChild(qLine);
-	// logo.addChild(qLine2);
-	// logo.addChild(hole);
-	// logo.mask = mask;
+	logo.mask = mask;
+	logo.scale.set(1);
 
-	//if($(window).width() < 620) 
-		logo.scale.set(1);
-
-	// bass.position.x = -100;
-	// highs.position.x = 100;
 	logo.position = {x: screenWidth/2, y: screenHeight/2};
+	mask.position = logo.position;
+	qLine.position = logo.position;
+	stage.addChild(qLine);
 	stage.addChild(logo);
 	barsContainer.position = {x: 0, y: 0};
 	stage.addChild(barsContainer);
